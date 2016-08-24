@@ -14,14 +14,3 @@ __shortbreak__ = time between interval with the default as 5 minutes
 __cycles__ = number of complete cycles  
 __status__ = can either be finished, pending, active or unknown  
 __sound__ = either on or off  
-
-
-To create the database run the following command;
-
-`python db_setup.py`  
-
-You will get the following on your terminal if the process is successful:  
-
-`user@User-PC: $ python db_script.py` 
-`Initialize database Creation`
-`Database timer_details creation finished succes!!`
