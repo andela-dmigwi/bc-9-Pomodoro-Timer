@@ -1,5 +1,4 @@
 import os
-import sys
 import logging
 from cliff.command import Command
 
@@ -22,4 +21,6 @@ class MyCommand(Command):
 
     #picks the parsed arguments and uses them
     def take_action(self, parsed_args):
-        self.app.stdout.write(str(parsed_args.arg) + "\n")
+        #self.app.stdout.write(str(parsed_args.arg) + "\n")
+        print(str(parsed_args.arg))
+        #Send argument to timer module
