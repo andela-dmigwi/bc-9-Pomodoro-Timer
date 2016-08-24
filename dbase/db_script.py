@@ -49,6 +49,5 @@ def initialize_n_create_db():
 
 		print 'Database timer_details creation finished succes!!'
 
-	except lite.Error, e:
-		
+	except lite.Error, e:		
 		print 'Error %s ocurred : Database Creation failed!!!'%e.arg[0]
