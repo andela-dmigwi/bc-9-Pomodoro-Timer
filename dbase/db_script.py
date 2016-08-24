@@ -1,7 +1,6 @@
 import sqlite3 as lite
 import sys
 
-
 #statusuuid
 # active = 37806757-4391-4c40-8cae-6bbfd71e893e
 # pending = 0eaec4f3-c524-40ab-b295-2db5cb7a0770
@@ -51,4 +50,5 @@ def initialize_n_create_db():
 		print 'Database timer_details creation finished succes!!'
 
 	except lite.Error, e:
+		
 		print 'Error %s ocurred : Database Creation failed!!!'%e.arg[0]
