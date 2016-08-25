@@ -1,13 +1,14 @@
-import os
 import logging
-from cliff.command import Command
+#from cliff.command import Command
+from timer import TimerThread
+from helpmessage import HelpMessage
 
 class MyCommand(Command):
+
+    timer_obj = TimerThread()
     '''
-    This Module will hold the cliff implementation that retrieves the
-    various command input by the user
-    This module also will hold cliff framework implementation although 
-    with some modification
+    This Module will hold the cliff implementation that retrieves the various command input by the user
+    This module also will hold cliff framework implementation although with some modification
     '''
 
     log = logging.getLogger(__name__)
@@ -21,6 +22,7 @@ class MyCommand(Command):
 
     #picks the parsed arguments and uses them
     def take_action(self, parsed_args):
-        #self.app.stdout.write(str(parsed_args.arg) + "\n")
-        print(str(parsed_args.arg))
-        #Send argument to timer module
+        argv = str(parsed_args.arg)
+        if(argv == None):       
+            print HelpMessage.help_message
+        MyCommand.timer_obj.command_type(argv)

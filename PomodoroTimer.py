@@ -3,11 +3,14 @@ import logging
 from cliff.app import App
 from cliff.commandmanager import CommandManager
 from pomodoro_command import MyCommand
+from cliff.show import ShowOne
+from cliff.lister import Lister
+from List_display import ListItems
 
 class PomodoroTimer(App):
     '''
-	This module will hold main file that will be run.
-	This is where the cliff implementation begins from
+    This module will hold main file that will be run.
+    This is where the cliff implementation begins from
     '''
 
     log = logging.getLogger(__name__)
@@ -18,7 +21,10 @@ class PomodoroTimer(App):
             version = '0.1',
             command_manager = command,
         )
-        commands = {'pomodoro': MyCommand}
+        commands = {
+        'pomodoro': MyCommand,
+        'listitems': ListItems       
+        }
 
         for k, v in commands.iteritems():
             command.add_command(k, v)
@@ -34,7 +40,6 @@ class PomodoroTimer(App):
         self.log.debug('clean_up %s', cmd.__class__.__name__)
         if err:
             self.log.debug('got an error: %s', err)
-
 
 def main(argv=sys.argv[1:]):
     app = PomodoroTimer()
