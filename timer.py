@@ -12,12 +12,15 @@ class TimerThread(object):
     ACTIVE = {}
     PENDING = {}
     FINISHED = {}
-    CREATED = {'uuid'= str(uuid.uuid4()), 'title'='',
-                'start_time'= int(time.time()), 
-                'duration'=25, 'shortbreak' = 5,
-                'longbreak' = 15, 'cycle'=0, 
-                'statusuuid'='37806757-4391-4c40-8cae-6bbfd71e893e', #Status active
-                'sounduuid'='510b9503-7899-4d69-83c0-690342daf271'} #sound on
+    CREATED = {'uuid': str(uuid.uuid4()), 
+                'title':'',
+                'start_time' : int(time.time()), 
+                'duration': 25, 
+                'shortbreak':5,
+                'longbreak' : 15, 
+                'cycle':0, 
+                'statusuuid':'37806757-4391-4c40-8cae-6bbfd71e893e', #Status active
+                'sounduuid':'510b9503-7899-4d69-83c0-690342daf271'} #sound on
     #statusuuid
     active = '37806757-4391-4c40-8cae-6bbfd71e893e'
     pending = '0eaec4f3-c524-40ab-b295-2db5cb7a0770'
@@ -55,9 +58,13 @@ class TimerThread(object):
         
         # if command is start*Migwi     
         if 'start*' in self.command:
-            self.tt_dict = TimerThread.CREATED          
-            msg = 'You have created a task called %s'%self.command.split('*':1)
+            msg = "The task name you selected is still active, Please select another one"
+            data = {} #Check if the task exist in database as active
+            if data not None:
+                self.tt_dict = TimerThread.CREATED          
+                msg = 'You have created a task called %s'%self.command.split('*':1)
             self.populate_tt_dict('title', self.command.split('*':1), msg)
+
 
         # time*1:3:2         
         elif 'time*' in self.command or 'config_time*' in self.command or
@@ -94,40 +101,61 @@ class TimerThread(object):
             self.populate_tt_dict('sounduuid', TimerThread.on, msg)
 
         #  else if command create*Migwi
-        #   push statusuuid active in dict
-        #   push all the data in the dict into the database
-        elif 'create*' in self.command:
-        #       send self.tt_dict to database
-        msg = 'You task has been set'
-        self.populate_tt_dict('', TimerThread.on, msg)
+        elif 'create*' in self.command:        
+        title = None
+        msg = None
+        data = {} #retrieve all pending entries to activate them
+        if self.tt_dict not None and self.tt_dict['title'] in self.command:
+            uuid = self.tt_dict['uuid']
+            end_time = self.tt_dict['start_time'] + self.tt_dict['duration']
+            TimerThread.ACTIVE[uuid] = end_time
+            msg = 'Your task has been set active and is due at %'%self.timestamp_to_normal(end_time)
+            self.tt_dict['statusuuid'] = TimerThread.active
+            title = self.tt_dict['title']
+            self.tt_dict = None
+        self.populate_tt_dict('title', title, msg)
 
 
         #  else if command pause*migwi
-        #   push statusuuid pending in database
-        #   remove it from active_dict to pending_dict
         elif 'pause*' in self.command:
-        #       send self.command.split('*':1) 
+            task =  self.command.split('*':1)
+            title = None
+            msg = 'Your task wasn\'t found'
+            data = {}#Select all where dict is active and title is given 
+            if data not None:
+                msg = 'Your task has been paused.'
+                uuid = data['uuid']
+                TimerThread.ACTIVE.remove[uuid]
+                TimerThread.PENDING[uuid] = data['start_time'] + data['duration']            
+            response  = msg
 
         #  else if command stop*migwi
         #   push statusuuid finished in database
         elif 'stop*' in self.command:
-        #       send self.command.split('*':1) 
+        task =  self.command.split('*':1) 
+        title = None
+        msg = None
+        data = {}#Select all where dict is active and title is given 
+        if data not None:
+            msg = 'Your task has been paused.'
+            uuid = data['uuid']
+            TimerThread.ACTIVE.remove[uuid]
+            #change the statusuuid 
+            TimerThread.PENDING[uuid] = data['start_time'] + data['duration']
+        msg = 'Your task wasn\'t found'
+        response  = msg
 
-        #  else if command list
-        #   list display all details in database
-        elif 'stop*' in self.command:
-        #       send self.command.split('*':1) 
+        #  else if command list       
+        elif 'list' == self.command:
+        #Select all the entries an display them 
 
-        #  else if command list*migwi
-        #   get all tasks with title migwi and display them
-        elif 'stop*' in self.command:
-        #       send self.command.split('*':1) 
+       
+        #  else if command list*12:07:2016       
+        elif 'list*' in self.command:
+            cmd = self.command.split('*':1)      
+            times = int(datetime.datetime.strptime(cmd, '%d:%m:%Y').strftime("%s"))
+            #retrieve all details with timestamps greater than times
 
-        #  else if command list*12d:7m:2016y
-        #   get all tasks set on specified date
-        elif 'stop*' in self.command:
-        #       send self.command.split('*':1)      
-        #'''
         print self.command
 
     def check_time(self):
@@ -142,13 +170,9 @@ class TimerThread(object):
     def thread_timer(self):
         '''
         maintain active dict and pending dict:
-        after 30 seconds check if current timestamp is greater 
-        or equal to timestamp in those dicts
-        if the said timestamp is in active dict:
-            push the task in running dict
-        else its in pending dict:
-            change its statusuuid to finished
-            remove it from pending list
+        if the said timestamp is in active dict push the task in running dict
+        else its in pending dict change its statusuuid to finished
+        remove it from pending items
         '''
         current_time = int(time.time())
         TimerThread.RUNNING = { k:v for k,v in TimerThread.ACTIVE.iteritem() if v >= current_time }
