@@ -2,6 +2,7 @@ import sqlite3 as lite
 import json
 import datetime
 import pytz
+import ast
 
 
 class DbManage(object):
@@ -34,7 +35,7 @@ class DbManage(object):
         self.cur.execute("SELECT * FROM timer_details WHERE title = '%s'"%title_name)
         data = self.cur.fetchall()
         self.con.close()
-        return json.dumps(data, ensure_ascii=False)
+        return data
 
     def get_entries_with_status(self, status, title_name =''):
         self.connect_db();
@@ -44,7 +45,7 @@ class DbManage(object):
             %(status,title_name))
         data = self.cur.fetchall()
         self.con.close() 
-        return json.dumps(data, ensure_ascii=False)
+        return data
 
     def store_a_new_record(self, record):
         self.connect_db();

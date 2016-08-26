@@ -158,7 +158,7 @@ class TimerThread(object):
             if data != None:
                 msg = 'Your task has been paused.'
                 uuid_pending = data[0][0] #should contain atmost one item
-                
+                       
                 TimerThread.ACTIVE.pop(uuid_pending)
                 TimerThread.PENDING[uuid_pending] = data['start_time'] + data['duration'] +10800 
                 TimerThread.db.update_the_status(TimerThread.pending, uuid_pending)
