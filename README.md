@@ -11,16 +11,16 @@ After the third cycle the user is forced into a long break that has a default ti
 This app is built use __cliff__ command line framework that the implementer the right to have an almost simmilar to commmandline applications like *git*  
 
 The pomodoro Timer application has the following commands  
-1.pomodoro create\*<title> this creates a timer object with the *title* implemented as  
+1.pomodoro create\*<title> this creates a timer object with the *title* implemented as 
     `pomodoro create*Presentation2` 
-2. pomodoro config_time\*<hrs:min:sec> this command modifies the default duration time  
-   `pomodoro config_time*1:34:20` the interval is 1 hr 34 minutes and 20 secs   
-3. pomodoro config_shortbreak\*<hrs:min:sec>  
-   `pomodoro config_shortbreak*7:0` the shortbreak time is 7 minutes 0 seconds   
-4. pomodoro config_longbreak*<hrs:min:sec>  
-   `pomodoro config_longbreak*20:0` the longbreak time is 20 minutes 0 seconds  
-5. pomodoro config_sound\*<on/off> Command sets the sound to either ring or not  
-    `pomodoro config_sound*on` set sound on  
+2. pomodoro config_time\*<hrs:min:sec> this command modifies the default duration time 
+   `pomodoro config_time*1:34:20` the interval is 1 hr 34 minutes and 20 secs 
+3. pomodoro config_shortbreak\*<hrs:min:sec> 
+   `pomodoro config_shortbreak*7:0` the shortbreak time is 7 minutes 0 seconds 
+4. pomodoro config_longbreak*<hrs:min:sec> 
+   `pomodoro config_longbreak*20:0` the longbreak time is 20 minutes 0 seconds 
+5. pomodoro config_sound\*<on/off> Command sets the sound to either ring or not 
+    `pomodoro config_sound*on` set sound on 
 6. pomodoro timer\*<hrs:min:sec> command set time from which the timer should start counting default time is now  
    `pomodoro timer*1:30:0` command sets to start the timer to start in 1hr and 30min  
 7. pomodoro start\*<title> command pushes all the data of a created task to the database  
