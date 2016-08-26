@@ -1,6 +1,8 @@
 ### bc-9-Pomodoro-Timer
 Repo will hold information about a pomodoro timer
 
+To run the app install the virtual environmnent and `requirements.txt`
+
 ###What is a pomodoro timer??
 This is a timer that counts time periods each with a default interval of 25 minutes but the interval can be adjusted.  
 There is a short break between each cycle with a default time of 5 minutes but its adjustable  
@@ -31,3 +33,6 @@ The pomodoro Timer application has the following commands
   `listitems`
 11. listitems byday*<dd:mm:YYYY> This command Lists all task with the start time equal to the given parameter  
   `listitems byday*28:08:2016` check all the command with the start date as 28th August 2016  
+
+Done by __Migwi Ndung'u__ @ 
+###0703764266

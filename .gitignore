@@ -90,4 +90,5 @@ ENV/
 
 
 *.pyo
-*pyc
+*.pyc
+*.md~
