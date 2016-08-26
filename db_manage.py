@@ -23,26 +23,20 @@ class DbManage(object):
         self.con = ''
         self.cur = ''
 
-
     def connect_db(self):
         self.con = lite.connect('dbase/pomodoro.db')
         with self.con:            
             self.cur = self.con.cursor()
-            print '.'*100
-
-        
+            print '.'*100        
 
     def get_all_tasks_by_name(self, title_name):
-        #print 'Migwi3'
         self.connect_db();
         self.cur.execute("SELECT * FROM timer_details WHERE title = '%s'"%title_name)
         data = self.cur.fetchall()
         self.con.close()
-        #print 'Migwi3',data 
         return json.dumps(data, ensure_ascii=False)
 
     def get_entries_with_status(self, status, title_name =''):
-        #print 'Migwi1'
         self.connect_db();
         if title_name is '':
             self.cur.execute("SELECT * FROM timer_details WHERE statusuuid = '%s'" %status)
@@ -50,11 +44,9 @@ class DbManage(object):
             %(status,title_name))
         data = self.cur.fetchall()
         self.con.close() 
-        #print 'Migwi1',data        
         return json.dumps(data, ensure_ascii=False)
 
     def store_a_new_record(self, record):
-        #print 'Migwi4'
         self.connect_db();
         row = []
         row.append(record['uuid'])
@@ -70,18 +62,15 @@ class DbManage(object):
         self.cur.execute("INSERT INTO timer_details VALUES(?,?,?,?,?,?,?,?,?)", tuple(row))
         self.con.commit()
         self.con.close()
-        #print 'Migwi4BB'
-
+        
 
     def update_the_status(self, status, uuid):
-        print 'Migwi5'
         self.connect_db();
         self.cur.execute("UPDATE timer_details SET statusuuid = %s WHERE uuid = '%s'"%(status,uuid))
         self.con.commit()
         self.con.close()
 
     def retrieve_all_entries(self):
-        #print 'Migwi6'
         self.connect_db();
         self.cur.execute("SELECT * FROM timer_details")
         data = self.cur.fetchall()
@@ -89,12 +78,10 @@ class DbManage(object):
         return self.format_list_items(data)
 
     def retrieve_entries_past_timestamp(self, timestamp):
-        #print 'Migwi2'
         self.connect_db();
         self.cur.execute("SELECT * FROM timer_details WHERE start_time = '%s'"%timestamp)
         data = self.cur.fetchall()
         self.con.close()
-        #print 'Migwi2',data 
         return self.format_list_items(data)
 
     def timestamp_to_normal(self, timestamp, form):        

@@ -9,6 +9,7 @@ There is a short break between each cycle with a default time of 5 minutes but i
 After the third cycle the user is forced into a long break that has a default time 15 minutes but it is also adjustable  
 
 This app is built use __cliff__ command line framework that the implementer the right to have an almost simmilar to commmandline applications like *git*  
+To run this app input command `python PomodoroTime.py`
 
 The pomodoro Timer application has the following commands  
 1.pomodoro create\*<title> this creates a timer object with the *title* implemented as 

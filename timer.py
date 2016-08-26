@@ -155,15 +155,13 @@ class TimerThread(object):
             cmd =  self.command.split('*',1)[1]
             msg = 'Your task wasn\'t found'
             data = TimerThread.db.get_entries_with_status(TimerThread.active, cmd)
-            data = [j for i in data for j in i] 
             if data != None:
                 msg = 'Your task has been paused.'
-                uuid = data[0][0] #should contain atmost one item
-                pprint( uuid+' Migwi     '+data[0])
-
-                TimerThread.ACTIVE.pop(uuid)
-                TimerThread.PENDING[uuid] = data['start_time'] + data['duration'] +10800 
-                TimerThread.db.update_the_status(TimerThread.pending, uuid)
+                uuid_pending = data[0][0] #should contain atmost one item
+                
+                TimerThread.ACTIVE.pop(uuid_pending)
+                TimerThread.PENDING[uuid_pending] = data['start_time'] + data['duration'] +10800 
+                TimerThread.db.update_the_status(TimerThread.pending, uuid_pending)
                 self.populate_tt_dict('', 'Display', msg)####
 
             self.populate_tt_dict('', '', msg) #Should raise an error with a help message
@@ -233,4 +231,5 @@ class TimerThread(object):
         ''' plays songs '''
         if sounduuid == TimerThread.on: #play the music
             os.popen2("cvlc mysong.mp3 --play-and-exit--")
+            print "Your Time has expired"
            
