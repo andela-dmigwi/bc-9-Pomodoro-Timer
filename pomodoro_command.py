@@ -1,5 +1,5 @@
 import logging
-#from cliff.command import Command
+from cliff.command import Command
 from timer import TimerThread
 from helpmessage import HelpMessage
 
@@ -26,3 +26,4 @@ class MyCommand(Command):
         if(argv == None):       
             print HelpMessage.help_message
         MyCommand.timer_obj.command_type(argv)
+        print MyCommand.timer_obj.response

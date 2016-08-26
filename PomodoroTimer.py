@@ -23,7 +23,7 @@ class PomodoroTimer(App):
         )
         commands = {
         'pomodoro': MyCommand,
-        'listitems': ListItems       
+        'listitems': ListItems
         }
 
         for k, v in commands.iteritems():
