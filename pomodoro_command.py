@@ -22,8 +22,10 @@ class MyCommand(Command):
 
     #picks the parsed arguments and uses them
     def take_action(self, parsed_args):
-        argv = str(parsed_args.arg)
-        if(argv == None):       
+    	print("\033c")
+        argv = str(parsed_args.arg).lower()
+        if(argv == 'pomodoro'):       
             print HelpMessage.help_message
-        MyCommand.timer_obj.command_type(argv)
-        print MyCommand.timer_obj.response
+        else:
+            MyCommand.timer_obj.command_type(argv)
+            print MyCommand.timer_obj.response

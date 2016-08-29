@@ -28,7 +28,15 @@ class DbManage(object):
         self.con = lite.connect('dbase/pomodoro.db')
         with self.con:            
             self.cur = self.con.cursor()
-            print '.'*100        
+            print '.'*100 
+
+    def get_respective_soundstatus(self, uuid):
+        self.connect_db();
+        self.cur.execute("SELECT * FROM timer_details WHERE uuid = '%s' AND sounduuid = '%s'"
+            %(uuid, DbManage.off))
+        data = self.cur.fetchall()
+        self.con.close()
+        return data       
 
     def get_all_tasks_by_name(self, title_name):
         self.connect_db();
@@ -39,9 +47,10 @@ class DbManage(object):
 
     def get_entries_with_status(self, status, title_name =''):
         self.connect_db();
-        if title_name is '':
+        if title_name == '':
             self.cur.execute("SELECT * FROM timer_details WHERE statusuuid = '%s'" %status)
-        self.cur.execute("SELECT * FROM timer_details WHERE statusuuid = '%s' and title ='%s'"
+        else:
+            self.cur.execute("SELECT * FROM timer_details WHERE statusuuid = '%s' and title ='%s'"
             %(status,title_name))
         data = self.cur.fetchall()
         self.con.close() 
@@ -65,9 +74,9 @@ class DbManage(object):
         self.con.close()
         
 
-    def update_the_status(self, status, uuid):
+    def update_the_status(self, uuid, status):
         self.connect_db();
-        self.cur.execute("UPDATE timer_details SET statusuuid = %s WHERE uuid = '%s'"%(status,uuid))
+        print self.cur.execute("UPDATE timer_details SET statusuuid = '%s' WHERE uuid = '%s'"%(status,uuid))
         self.con.commit()
         self.con.close()
 
@@ -80,7 +89,7 @@ class DbManage(object):
 
     def retrieve_entries_past_timestamp(self, timestamp):
         self.connect_db();
-        self.cur.execute("SELECT * FROM timer_details WHERE start_time = '%s'"%timestamp)
+        self.cur.execute("SELECT * FROM timer_details WHERE start_time >= '%s'"%timestamp)
         data = self.cur.fetchall()
         self.con.close()
         return self.format_list_items(data)
@@ -90,11 +99,7 @@ class DbManage(object):
         if 'full' in form:            
             time = str(datetime.datetime.fromtimestamp(timestamp).strftime('%d/%m/%Y %H:%M:%S'))
         else:
-            time =  str(datetime.datetime.fromtimestamp(timestamp).strftime('%H:%M:%S'))
-
-        #naive_date = datetime.datetime.strptime(time, "%Y-%m-%d %H:%M:%S")        
-        #localtz = pytz.timezone('Africa/Nairobi')
-        #date = time.replace(tzinfo=localtz)        
+            time =  str(datetime.datetime.fromtimestamp(timestamp).strftime('%HHrs %MMin %SSec'))             
         return time
 
     def format_list_items(self, resultset):
@@ -134,6 +139,14 @@ class DbManage(object):
             temp.append(tuple(sublist))
 
         return tuple(temp)
+
+    def populate_temp_dictionaries(self,status):
+        temp = {}
+        elems = self.get_entries_with_status(status)
+        for item in elems:
+            temp[item[0]] = item[2] + item[3] + 10800
+        return temp
+
 
 if __name__ == '__main__':
     db = DbManage()

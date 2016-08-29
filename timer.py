@@ -16,10 +16,10 @@ class TimerThread(object):
     ACTIVE = {}
     PENDING = {}
     FINISHED = {}
-    CREATED = {'uuid': str(uuid.uuid4()), 
+    CREATED = {'uuid': '', 
                 'title':'',
-                'start_time' : int(time.time()), 
-                'duration': -9300, 
+                'start_time' : 0, 
+                'duration': -10740, 
                 'shortbreak': -10500,
                 'longbreak' : -9900, 
                 'cycle':0, 
@@ -38,17 +38,22 @@ class TimerThread(object):
     db = DbManage()
 
 
-    def __init(self):             
-        self.response = ''
-        self.tt_dict = None         
+    def __init__(self):             
+        self.response = HelpMessage.help_message
+        self.tt_dict = {}  
+        #TimerThread.RUNNING = TimerThread.db.populate_temp_dictionaries(TimerThread.running) 
+        TimerThread.ACTIVE = TimerThread.db.populate_temp_dictionaries(TimerThread.active) 
+        TimerThread.PENDING = TimerThread.db.populate_temp_dictionaries(TimerThread.pending) 
+        #TimerThread.FINISHED = TimerThread.db.populate_temp_dictionaries(TimerThread.finished)  
+        print 'temp dictionaries population finished'    
         
     def timestamp_to_normal(self, timestamp):
         '''Method coverts timestamp to Normal time'''
-        return str(datetime.datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S'))
+        return str(datetime.datetime.fromtimestamp(timestamp).strftime('%d/%m/%Y %H:%M:%S'))
 
     def populate_tt_dict(self, key, value, msg):
         '''Manages the dict and returns the appropriate message'''
-        if self.tt_dict != None and key != '':
+        if len(self.tt_dict) > 0 and key != '':
             self.tt_dict[key] = value
             self.response  = msg
         elif key == '':    
@@ -92,13 +97,17 @@ class TimerThread(object):
         self.command = command 
         # if command is create*Migwi     
         if 'create*' in self.command:
+            uuidValue = str(uuid.uuid4())
             msg = "The task name you selected is still active, Please select another one"
             cmd = self.command.split('*',1)[1]
-            data = TimerThread.db.get_all_tasks_by_name(cmd)
-            if len(data) > 0:
-                self.tt_dict = TimerThread.CREATED          
+            data = TimerThread.db.get_all_tasks_by_name(cmd)           
+            if len(data) == 0:
+                self.tt_dict = TimerThread.CREATED
                 msg = 'You have created a task called %s'%cmd
             self.populate_tt_dict('title', cmd, msg)####
+            self.populate_tt_dict('uuid', uuidValue, msg)####
+            self.populate_tt_dict('start_time', int(time.time()), msg)####
+
 
 
         # time*1:3:2         
@@ -118,7 +127,7 @@ class TimerThread(object):
         #  sound*on       
         elif 'sound*' in self.command:
             cmd = self.command.split('*',1)[1]  
-            if 'off' in cmd:
+            if 'off' in cmd or 'f' in cmd:
                 msg = 'Sound Ringing is OFF'
                 self.populate_tt_dict('sounduuid', TimerThread.off, msg)####
             msg = 'Sound Ringing is ON'
@@ -127,20 +136,20 @@ class TimerThread(object):
         #  else if command start*Migwi
         elif 'start*' in self.command: 
             cmd = self.command.split('*',1)[1]
-            uuid = ''
+            uuid_item = ''
             end_time = ''
             msg = 'You provided an incorrect Task Title'
             data = TimerThread.db.get_entries_with_status(TimerThread.pending, cmd)
             
             if data != None and self.tt_dict['title'] == cmd:
                 if self.tt_dict['title'] == cmd:
-                    uuid = self.tt_dict['uuid']
+                    uuid_item = self.tt_dict['uuid']
                     end_time = self.tt_dict['start_time'] + self.tt_dict['duration'] +10800
                 else:
-                    uuid = data[0][0] 
+                    uuid_item = data[0][0] 
                     end_time = data[0][2] + data[0][3]
                                        
-                TimerThread.ACTIVE[uuid] = end_time 
+                TimerThread.ACTIVE[uuid_item] = end_time 
                 msg = ('Your task is active and is due at %s'%self.timestamp_to_normal(end_time))
                 self.tt_dict['statusuuid'] = TimerThread.active
                 TimerThread.db.store_a_new_record(self.tt_dict)   
@@ -158,10 +167,10 @@ class TimerThread(object):
             if data != None:
                 msg = 'Your task has been paused.'
                 uuid_pending = data[0][0] #should contain atmost one item
-                       
+                
                 TimerThread.ACTIVE.pop(uuid_pending)
-                TimerThread.PENDING[uuid_pending] = data['start_time'] + data['duration'] +10800 
-                TimerThread.db.update_the_status(TimerThread.pending, uuid_pending)
+                TimerThread.PENDING[uuid_pending] = data[0][2] + data[0][3] +10800 
+                TimerThread.db.update_the_status(uuid_pending, TimerThread.pending)
                 self.populate_tt_dict('', 'Display', msg)####
 
             self.populate_tt_dict('', '', msg) #Should raise an error with a help message
@@ -173,9 +182,9 @@ class TimerThread(object):
             data = self.db.get_entries_with_status(TimerThread.pending, cmd)
             if len(data) > 0:
                 msg = 'Your task has been stopped.'
-                uuid = data[0][0]                             
-                TimerThread.PENDING.pop(uuid) 
-                TimerThread.db.update_the_status(TimerThread.finished, uuid) 
+                uuid_stop = data[0][0]                             
+                TimerThread.PENDING.pop(uuid_stop) 
+                TimerThread.db.update_the_status(uuid_stop, TimerThread.finished) 
                 self.populate_tt_dict('', 'Display', msg)####
 
             self.populate_tt_dict('', '', msg) #Should raise an error with a help message           
@@ -191,8 +200,8 @@ class TimerThread(object):
         #     times = int(datetime.datetime.strptime(cmd, '%d:%m:%Y').strftime("%s"))
         #     #retrieve all details with timestamps greater than times
 
-        # elif s
-        # print self.command,'Migwi',HelpMessage.help_message,
+        else:
+            self.response = '\'%s\' does not exist in the program commands. \n %s'%(self.command, HelpMessage.help_message)
         self.check_time()
 
     def check_time(self):
@@ -202,7 +211,7 @@ class TimerThread(object):
 
         task2 = Timer(30.0, self.execute_alarm) 
         task2.start()
-
+        
 
     def thread_timer(self):
         '''
@@ -211,8 +220,9 @@ class TimerThread(object):
         else its in pending dict change its statusuuid to finished
         remove it from pending items
         '''
+        
         current_time = int(time.time())
-        TimerThread.RUNNING = { k:v for k,v in TimerThread.ACTIVE.iteritems() if v >= current_time }
+        TimerThread.RUNNING = { k:v for k,v in TimerThread.ACTIVE.iteritems() if v == current_time }
         TimerThread.FINISHED = { k:v for k,v in TimerThread.PENDING.iteritems() if v >= current_time }
 
     def execute_alarm(self):
@@ -220,16 +230,7 @@ class TimerThread(object):
 
         if len(TimerThread.RUNNING): #is greater than zero do run a task 
             for k,v in TimerThread.RUNNING.iteritems():
-                data = {}#Retrieve title,sounduuid of the key/uuid from the database
-                if len(data):
-                    print 'Your %s task is over'%data['title']
-                    self.play_music(data['sounduuid'])
-                    
-
-            
-    def play_music(self, sounduuid):
-        ''' plays songs '''
-        if sounduuid == TimerThread.on: #play the music
-            os.popen2("cvlc mysong.mp3 --play-and-exit--")
-            print "Your Time has expired"
-           
+                data = TimerThread.db.get_respective_soundstatus(k)                
+                if len(data)>0:                    
+                    self.response = 'Your \'%s\' task is over'%data[1]
+                    os.popen2("cvlc song/mysong.mp3 ") #play music
